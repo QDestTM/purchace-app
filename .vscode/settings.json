@@ -1,0 +1,72 @@
+{
+	"folder-color.pathColors": [
+		{
+			"folderPath": "sql_test\\android\\",
+			"color": "foldercolorizer.color_00cc99"
+		},
+		{
+			"folderPath": "sql_test\\build\\",
+			"color": "foldercolorizer.color_cccc99"
+		},
+		{
+			"folderPath": "sql_test\\lib\\",
+			"color": "foldercolorizer.color_99ccff"
+		},
+		{
+			"folderPath": "sql_test\\.vscode\\",
+			"color": "foldercolorizer.color_0099cc"
+		},
+		{
+			"folderPath": "sql_test\\.dart_tool\\",
+			"color": "foldercolorizer.color_336699"
+		},
+		{
+			"folderPath": "sql_test\\.gitignore\\",
+			"color": "foldercolorizer.color_993333"
+		},
+		{
+			"folderPath": "sql_test\\.metadata\\",
+			"color": "foldercolorizer.color_6699cc"
+		},
+		{
+			"folderPath": "sql_test\\README.md\\",
+			"color": "foldercolorizer.color_999966"
+		},
+		{
+			"folderPath": "sql_test\\analysis_options.yaml\\",
+			"color": "foldercolorizer.color_ff6666"
+		},
+		{
+			"folderPath": "sql_test\\devtools_options.yaml\\",
+			"color": "foldercolorizer.color_ff6666"
+		},
+		{
+			"folderPath": "sql_test.iml\\",
+			"color": "foldercolorizer.color_ff9966"
+		},
+		{
+			"folderPath": "sql_test\\pubspec.lock\\",
+			"color": "foldercolorizer.color_ffcc99"
+		},
+		{
+			"folderPath": "sql_test\\pubspec.yaml\\",
+			"color": "foldercolorizer.color_ffcc99"
+		},
+		{
+			"folderPath": "sql_test\\.flutter-plugins\\",
+			"color": "foldercolorizer.color_cccc99"
+		},
+		{
+			"folderPath": "sql_test\\.flutter-plugins-dependencies\\",
+			"color": "foldercolorizer.color_cccc99"
+		},
+		{
+			"folderPath": "sql_test\\.git\\",
+			"color": "foldercolorizer.color_666699"
+		},
+		{
+			"folderPath": "sql_test\\assets\\",
+			"color": "foldercolorizer.color_cc6666"
+		}
+	]
+}

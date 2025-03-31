@@ -1,0 +1,9 @@
+include: package:flutter_lints/flutter.yaml
+
+formatter:
+  page_width: 150
+
+
+linter:
+  rules:
+    avoid_print: true
