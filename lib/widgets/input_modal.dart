@@ -11,12 +11,14 @@ class InputModal extends StatefulWidget
 	// ^ ----------------------------------------------------------------------------------------------------<
 
 	// Members
-	final PurchaseData? data;
+	final Function(PurchaseData) inputCallback;
+	final PurchaseData? updateData;
 
 	// Constructors
 	const InputModal({
 		super.key,
-		this.data
+		this.updateData,
+		required this.inputCallback,
 	});
 
 	// # ----------------------------------------------------------------------------------------------------<
@@ -95,7 +97,7 @@ class InputModalState extends State<InputModal>
 		super.initState();
 
 		// Initialize initial data
-		final PurchaseData? data = widget.data;
+		final PurchaseData? data = widget.updateData;
 
 		_initialDataPart = PurchaseData(
 			name: "", quantity: 0, price: 0.0,
@@ -217,6 +219,23 @@ class InputModalState extends State<InputModal>
 		}
 
 		// Build and save purchase data
+		final date = stateDateInput.value!;
+		final time = stateTimeInput.value!;
+
+		final data = PurchaseData(
+			name: stateNameInput.value!,
+			category: stateCategoryInput.value!,
+			price: statePriceInput.value!,
+			quantity: stateQuantityInput.value!,
+
+			date: DateTime(
+				date.year, date.month, date.day, time.hour, time.minute
+			),
+
+			id: widget.updateData?.id ?? 0
+		);
+
+		widget.inputCallback(data);
 
 		// Close input modal panel
 		Navigator.pop(context);
@@ -285,6 +304,9 @@ class InputModalState extends State<InputModal>
 							{
 								if ( value == null || value.isEmpty ) {
 									return "Це поле не може бути пустим";
+								}
+								if ( value.length > 32 ) {
+									return "Ввід не може перевищувати 32 символи";
 								}
 
 								return null;
@@ -395,7 +417,7 @@ class InputModalState extends State<InputModal>
 						child: FormField<double>(
 							key: _keyPriceInput,
 
-							initialValue: widget.data?.price,
+							initialValue: widget.updateData?.price,
 							autovalidateMode: AutovalidateMode.onUserInteraction,
 
 							builder: (fieldState)
@@ -440,9 +462,12 @@ class InputModalState extends State<InputModal>
 							{
 								if ( value == null ) {
 									return "Обов'язковo*";
-								} else
+								}
 								if ( value < 0.01 ) {
 									return "Ціна < 0.01";
+								}
+								if ( value > 32678 ) {
+									return "Ціна > 32678";
 								}
 
 								return null;
@@ -455,7 +480,7 @@ class InputModalState extends State<InputModal>
 						child: FormField<int>(
 							key: _keyQuantityInput,
 
-							initialValue: widget.data?.quantity,
+							initialValue: widget.updateData?.quantity,
 							autovalidateMode: AutovalidateMode.onUserInteraction,
 
 							builder: (fieldState)
@@ -498,9 +523,12 @@ class InputModalState extends State<InputModal>
 							{
 								if ( value == null ) {
 									return "Обов'язковo*";
-								} else
+								}
 								if ( value < 1 ) {
 									return "К-ть < 1";
+								}
+								if ( value > 32768 ) {
+									return "К-ть > 32768";
 								}
 
 								return null;
@@ -540,7 +568,7 @@ class InputModalState extends State<InputModal>
 					child: FormField<DateTime>(
 						key: _keyDateInput,
 
-						initialValue: widget.data?.date ?? _initialDateValue,
+						initialValue: widget.updateData?.date ?? _initialDateValue,
 
 						builder: (fieldState)
 						{
@@ -570,7 +598,7 @@ class InputModalState extends State<InputModal>
 					child: FormField<TimeOfDay>(
 						key: _keyTimeInput,
 
-						initialValue: widget.data?.time ?? _initialTimeValue,
+						initialValue: widget.updateData?.time ?? _initialTimeValue,
 
 						builder: (fieldState)
 						{
@@ -619,7 +647,7 @@ class InputModalState extends State<InputModal>
 			onPressed: _onAppendButtonPress,
 
 			child: Text(
-				(widget.data == null) ? "Додати" : "Оновити",
+				(widget.updateData == null) ? "Додати" : "Оновити",
 
 				style: TextStyle(
 					fontSize: 16, color: scheme.inverseSurface
