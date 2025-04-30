@@ -3,6 +3,8 @@ import 'package:sql_test/models/purchase_data.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import 'dart:math';
+
 
 class PurchaseDisplay extends StatelessWidget
 {
@@ -16,17 +18,77 @@ class PurchaseDisplay extends StatelessWidget
 	// ^ ----------------------------------------------------------------------------------------------------<
 
 	// Members
-	final Function() onLongPress;
+	final Function() onUpdateAction;
+	final Function() onDeleteAction;
+
+	final ValueKey<int> vkey;
 	final PurchaseData data;
 
 	// Constructors
 	const PurchaseDisplay({
-		super.key,
+		required this.vkey,
 		required this.data,
-		required this.onLongPress
-	});
+		required this.onUpdateAction,
+		required this.onDeleteAction
+	})
+	: super(key: vkey);
 
 	// # ----------------------------------------------------------------------------------------------------<
+
+	Future<bool> _confirmDismiss(BuildContext context, DismissDirection direction) async
+	{
+		final theme = Theme.of(context);
+		final scheme = theme.colorScheme;
+
+		// Awaiting for result from showDialog call
+		final confirm = await showDialog<bool>(
+			context: context,
+
+			builder: (context)
+			{
+				// Building tree of widgets
+				return AlertDialog(
+					title: Text("Видалення",
+						style: theme.textTheme.titleMedium,
+						textAlign: TextAlign.center,
+					),
+
+					content: Text(
+						"Ця дія видалить запис про цю покупку із списку.",
+						style: theme.textTheme.bodyMedium
+					),
+
+					actions: <Widget>
+					[
+						TextButton(
+							onPressed: () {
+								Navigator.of(context).pop<bool>(false);
+							},
+
+							child: const Text("Залишити")
+						),
+
+						TextButton(
+							style: TextButton.styleFrom(
+								backgroundColor: scheme.error,
+								foregroundColor: scheme.surface
+							),
+
+							onPressed: () {
+								Navigator.of(context).pop<bool>(true);
+							},
+
+							child: const Text("Видалити!")
+						),
+					],
+				);
+			},
+		);
+
+		return confirm ?? false;
+	}
+
+	// ------------------------------------------------------------------------------------------------------<
 
 	Widget _buildTopRow(BuildContext context)
 	{
@@ -116,33 +178,117 @@ class PurchaseDisplay extends StatelessWidget
 	{
 		final scheme = Theme.of(context).colorScheme;
 
+		// Define dismiss progress value
+		final progressListenable = ValueNotifier<double>(0);
+
 		// Building tree of widgets
 		return ConstrainedBox(
 			constraints: BoxConstraints.expand(height: height),
 
-			child: Ink(
-				decoration: BoxDecoration(
-					color: scheme.surfaceContainer,
-					borderRadius: const BorderRadius.all(radius),
+			child: ValueListenableBuilder(
+				valueListenable: progressListenable,
 
-					border: Border(
-						left: BorderSide(
-							color: scheme.secondaryFixed, width: 8.0
+				builder: (context, value, child)
+				{
+					final color = Color.lerp(
+						scheme.secondaryFixed, Colors.red, value)!;
+
+					// Building tree of widgets
+					return DecoratedBox(
+						decoration: BoxDecoration(
+							borderRadius: const BorderRadius.all(radius),
+							color: color,
 						),
-					)
-				),
 
-				child: InkWell(
-					splashColor: scheme.surfaceContainerHighest,
-					onLongPress: onLongPress,
+						child: child,
+					);
+				},
 
-					borderRadius: const BorderRadius.only(
-						topRight: radius, bottomRight: radius
+				//* Child of ValueListenableBuilder
+				child: Dismissible(
+					direction: DismissDirection.startToEnd,
+					key: vkey,
+
+					dismissThresholds: {
+						DismissDirection.startToEnd : 0.6
+					},
+
+					confirmDismiss: (direction) async {
+						final confirm = await _confirmDismiss(context, direction);
+
+						if (confirm) onDeleteAction();
+						return confirm;
+					},
+
+					onUpdate: (details) {
+						progressListenable.value = min(details.progress * 1.7, 1.0);
+					},
+
+					background: ValueListenableBuilder(
+						valueListenable: progressListenable,
+
+						builder: (context, value, child)
+						{
+							// Building tree of widgets
+							return Padding(
+								padding: const EdgeInsets.all(10.0),
+
+								child: Align(
+									alignment: Alignment.centerLeft,
+
+									child: Transform.scale(
+										scale: value, child: child,
+									),
+								),
+							);
+						},
+
+						//* Child of ValueListenableBuilder
+						child: const Icon(Icons.delete, size: height * 0.6),
 					),
 
-					child: _buildContent(context),
+					child: ValueListenableBuilder(
+						valueListenable: progressListenable,
+						builder: (context, value, child)
+						{
+							final color = Color.lerp(
+								scheme.secondaryFixed, Colors.red, value)!;
+
+							// Building tree of widgets
+							return Material(
+								type: MaterialType.transparency,
+
+								child: Ink(
+									decoration: BoxDecoration(
+										color: scheme.surfaceContainer,
+										borderRadius: const BorderRadius.all(radius),
+
+										border: Border(
+											left: BorderSide(
+												color: color, width: 8.0
+											),
+										)
+									),
+
+									child: child,
+								),
+							);
+						},
+
+						//* Child of ValueListenableBuilder
+						child: InkWell(
+							splashColor: scheme.surfaceContainerHighest,
+							onLongPress: onUpdateAction,
+
+							borderRadius: const BorderRadius.only(
+								topRight: radius, bottomRight: radius
+							),
+
+							child: _buildContent(context),
+						),
+					),
 				),
-			)
+			),
 		);
 	}
 
