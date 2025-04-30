@@ -637,6 +637,10 @@ class InputModalState extends State<InputModal>
 	{
 		final scheme = Theme.of(context).colorScheme;
 
+		// Define button text
+		final buttonText = widget.updateData == null
+			? "Додати" : "Оновити";
+
 		// Building tree of widgets
 		return TextButton(
 			style: TextButton.styleFrom(
@@ -646,9 +650,7 @@ class InputModalState extends State<InputModal>
 
 			onPressed: _onAppendButtonPress,
 
-			child: Text(
-				(widget.updateData == null) ? "Додати" : "Оновити",
-
+			child: Text(buttonText,
 				style: TextStyle(
 					fontSize: 16, color: scheme.inverseSurface
 				),
@@ -662,13 +664,17 @@ class InputModalState extends State<InputModal>
 	{
 		final theme = Theme.of(context);
 
+		// Define title text
+		final titleText = widget.updateData == null
+			? "Додати покупку" : "Оновити покупку";
+
 		// Building tree of widgets
 		return Column(
 			crossAxisAlignment: CrossAxisAlignment.stretch,
 
 			children: <Widget>
 			[
-				Text("Додати покупку",
+				Text(titleText,
 					textAlign: TextAlign.center,
 					style: theme.textTheme.titleLarge,
 				),
