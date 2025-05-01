@@ -163,11 +163,17 @@ class HomePageState extends State<HomePage>
 	@override
 	Widget build(BuildContext context)
 	{
-		final scheme = Theme.of(context).colorScheme;
+		final theme = Theme.of(context);
+		final scheme = theme.colorScheme;
 
 		// Building tree of widgets
 		return Scaffold(
 			appBar: AppBar(
+				centerTitle: true,
+				title: Text(
+					"Облік покупок", style: theme.textTheme.titleLarge
+				),
+
 				backgroundColor: scheme.secondaryFixed,
 			),
 
