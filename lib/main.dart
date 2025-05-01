@@ -45,7 +45,7 @@ class SQLTest extends StatelessWidget
 
 		// Building tree of widgets
 		return MaterialApp(
-			title: 'SQL Test', theme: theme,
+			title: 'Purchase List', theme: theme,
 			supportedLocales: [
 				Locale('uk', 'UA')
 			],
