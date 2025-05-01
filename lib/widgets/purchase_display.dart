@@ -13,7 +13,6 @@ class PurchaseDisplay extends StatelessWidget
 
 	// Constants
 	static const Radius radius = Radius.circular(8.0);
-	static const double height = 96.0;
 
 	// ^ ----------------------------------------------------------------------------------------------------<
 
@@ -24,12 +23,15 @@ class PurchaseDisplay extends StatelessWidget
 	final ValueKey<int> vkey;
 	final PurchaseData data;
 
+	final double height;
+
 	// Constructors
 	const PurchaseDisplay({
 		required this.vkey,
 		required this.data,
 		required this.onUpdateAction,
-		required this.onDeleteAction
+		required this.onDeleteAction,
+		required this.height
 	})
 	: super(key: vkey);
 
@@ -182,110 +184,106 @@ class PurchaseDisplay extends StatelessWidget
 		final progressListenable = ValueNotifier<double>(0);
 
 		// Building tree of widgets
-		return ConstrainedBox(
-			constraints: BoxConstraints.expand(height: height),
+		return ValueListenableBuilder(
+			valueListenable: progressListenable,
 
-			child: ValueListenableBuilder(
-				valueListenable: progressListenable,
+			builder: (context, value, child)
+			{
+				final color = Color.lerp(
+					scheme.secondaryFixed, Colors.red, value)!;
 
-				builder: (context, value, child)
-				{
-					final color = Color.lerp(
-						scheme.secondaryFixed, Colors.red, value)!;
-
-					// Building tree of widgets
-					return DecoratedBox(
-						decoration: BoxDecoration(
-							borderRadius: const BorderRadius.all(radius),
-							color: color,
-						),
-
-						child: child,
-					);
-				},
-
-				//* Child of ValueListenableBuilder
-				child: Dismissible(
-					direction: DismissDirection.startToEnd,
-					key: vkey,
-
-					dismissThresholds: {
-						DismissDirection.startToEnd : 0.6
-					},
-
-					confirmDismiss: (direction) async {
-						final confirm = await _confirmDismiss(context, direction);
-
-						if (confirm) onDeleteAction();
-						return confirm;
-					},
-
-					onUpdate: (details) {
-						progressListenable.value = min(details.progress * 1.7, 1.0);
-					},
-
-					background: ValueListenableBuilder(
-						valueListenable: progressListenable,
-
-						builder: (context, value, child)
-						{
-							// Building tree of widgets
-							return Padding(
-								padding: const EdgeInsets.all(10.0),
-
-								child: Align(
-									alignment: Alignment.centerLeft,
-
-									child: Transform.scale(
-										scale: value, child: child,
-									),
-								),
-							);
-						},
-
-						//* Child of ValueListenableBuilder
-						child: const Icon(Icons.delete, size: height * 0.6),
+				// Building tree of widgets
+				return DecoratedBox(
+					decoration: BoxDecoration(
+						borderRadius: const BorderRadius.all(radius),
+						color: color,
 					),
 
-					child: ValueListenableBuilder(
-						valueListenable: progressListenable,
-						builder: (context, value, child)
-						{
-							final color = Color.lerp(
-								scheme.secondaryFixed, Colors.red, value)!;
+					child: child,
+				);
+			},
 
-							// Building tree of widgets
-							return Material(
-								type: MaterialType.transparency,
+			//* Child of ValueListenableBuilder
+			child: Dismissible(
+				direction: DismissDirection.startToEnd,
+				key: vkey,
 
-								child: Ink(
-									decoration: BoxDecoration(
-										color: scheme.surfaceContainer,
-										borderRadius: const BorderRadius.all(radius),
+				dismissThresholds: {
+					DismissDirection.startToEnd : 0.6
+				},
 
-										border: Border(
-											left: BorderSide(
-												color: color, width: 8.0
-											),
-										)
-									),
+				confirmDismiss: (direction) async {
+					final confirm = await _confirmDismiss(context, direction);
 
-									child: child,
+					if (confirm) onDeleteAction();
+					return confirm;
+				},
+
+				onUpdate: (details) {
+					progressListenable.value = min(details.progress * 1.7, 1.0);
+				},
+
+				background: ValueListenableBuilder(
+					valueListenable: progressListenable,
+
+					builder: (context, value, child)
+					{
+						// Building tree of widgets
+						return Padding(
+							padding: const EdgeInsets.all(10.0),
+
+							child: Align(
+								alignment: Alignment.centerLeft,
+
+								child: Transform.scale(
+									scale: value, child: child,
 								),
-							);
-						},
-
-						//* Child of ValueListenableBuilder
-						child: InkWell(
-							splashColor: scheme.surfaceContainerHighest,
-							onLongPress: onUpdateAction,
-
-							borderRadius: const BorderRadius.only(
-								topRight: radius, bottomRight: radius
 							),
+						);
+					},
 
-							child: _buildContent(context),
+					//* Child of ValueListenableBuilder
+					child: Icon(Icons.delete, size: height * 0.6),
+				),
+
+				child: ValueListenableBuilder(
+					valueListenable: progressListenable,
+					builder: (context, value, child)
+					{
+						final color = Color.lerp(
+							scheme.secondaryFixed, Colors.red, value)!;
+
+						// Building tree of widgets
+						return Material(
+							type: MaterialType.transparency,
+
+							child: Ink(
+								decoration: BoxDecoration(
+									color: scheme.surfaceContainer,
+									borderRadius: const BorderRadius.all(radius),
+
+									border: Border(
+										left: BorderSide(
+											color: color, width: 8.0
+										),
+									)
+								),
+
+								child: child,
+							),
+						);
+					},
+
+					//* Child of ValueListenableBuilder
+					child: InkWell(
+						splashColor: scheme.surfaceContainerHighest,
+						onLongPress: onUpdateAction,
+
+						borderRadius: const BorderRadius.only(
+							topRight: radius, bottomRight: radius
 						),
+
+						child: _buildContent(context),
 					),
 				),
 			),
